@@ -12,9 +12,6 @@ namespace Fuzz
         {
             Fuzzer.LibFuzzer.Run(static bytes =>
             {
-                //ReadOnlySpan<byte> bytes = ""u8;
-                //ReadOnlySpan<char> chars = "foo\nfoobarfoobarfoobarfoobarfoobar";
-
                 ReadOnlySpan<char> chars = MemoryMarshal.Cast<byte, char>(bytes);
 
                 int newLine = chars.IndexOf('\n');

@@ -1,0 +1,1 @@
+powershell .\fuzz-libfuzzer.ps1 -libFuzzer C:\bin\libfuzzer-dotnet-windows.exe -project .\SearchValuesFuzz.csproj -corpus Testcases
