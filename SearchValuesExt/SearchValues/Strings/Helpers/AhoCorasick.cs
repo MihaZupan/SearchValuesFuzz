@@ -246,14 +246,7 @@ namespace System.Buffers
                     (uint)(i + 1) < (uint)span.Length &&
                     char.IsLowSurrogate(lowSurrogate = Unsafe.Add(ref MemoryMarshal.GetReference(span), i + 1)))
                 {
-                    if (CorelibCompat.UseNls)
-                    {
-                        SurrogateToUpperNLS(c, lowSurrogate, out c, out lowSurrogateUpper);
-                    }
-                    else
-                    {
-                        CorelibCompat.SurrogateCasingToUpper(c, lowSurrogate, out c, out lowSurrogateUpper);
-                    }
+                    CorelibCompat.SurrogateCasingToUpper(c, lowSurrogate, out c, out lowSurrogateUpper);
 
                     Debug.Assert(lowSurrogateUpper != LowSurrogateNotSet);
                 }
@@ -316,21 +309,6 @@ namespace System.Buffers
 
         Return:
             return result;
-        }
-
-        private static void SurrogateToUpperNLS(char h, char l, out char hr, out char lr)
-        {
-            Debug.Assert(char.IsHighSurrogate(h));
-            Debug.Assert(char.IsLowSurrogate(l));
-
-            Span<char> chars = stackalloc char[] { h, l };
-            Span<char> destination = stackalloc char[2];
-
-            int written = CorelibCompat.ToUpperOrdinal(chars, destination);
-            Debug.Assert(written == 2);
-
-            hr = destination[0];
-            lr = destination[1];
         }
 
         public interface IFastScan { }

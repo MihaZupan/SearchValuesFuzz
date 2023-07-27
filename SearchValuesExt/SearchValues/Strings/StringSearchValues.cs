@@ -138,6 +138,11 @@ namespace System.Buffers
 
             if (nonAsciiAffectedByCaseConversion)
             {
+                if (CorelibCompat.UseNls || ContainsIncompleteSurrogatePairs(values))
+                {
+                    return new MultiStringIgnoreCaseSearchValuesFallback(uniqueValues);
+                }
+
                 return PickAhoCorasickImplementation<CaseInsensitiveUnicode>(ahoCorasick, uniqueValues);
             }
 
@@ -367,6 +372,34 @@ namespace System.Buffers
                     }
                 }
             }
+        }
+
+        private static bool ContainsIncompleteSurrogatePairs(ReadOnlySpan<string> values)
+        {
+            foreach (string value in values)
+            {
+                const char HIGH_SURROGATE_START = '\ud800';
+                const char HIGH_SURROGATE_END = '\udbff';
+
+                int i = value.AsSpan().IndexOfAnyInRange(HIGH_SURROGATE_START, HIGH_SURROGATE_END);
+                if (i < 0)
+                {
+                    continue;
+                }
+
+                for (; i < value.Length; i++)
+                {
+                    if (char.IsHighSurrogate(value[i]))
+                    {
+                        if ((uint)(i + 1) >= (uint)value.Length || !char.IsLowSurrogate(value[i + 1]))
+                        {
+                            return true;
+                        }
+                    }
+                }
+            }
+
+            return false;
         }
     }
 }
