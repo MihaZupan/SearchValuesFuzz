@@ -6,7 +6,7 @@ namespace Fuzz
 {
     public class Program
     {
-        private const StringComparison ComparisonType = StringComparison.Ordinal;
+        private const StringComparison ComparisonType = StringComparison.OrdinalIgnoreCase;
 
         public static void Main()
         {

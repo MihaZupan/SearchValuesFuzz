@@ -2,7 +2,6 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 
 using System.Diagnostics;
-using System.Globalization;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Runtime.Intrinsics;
@@ -62,12 +61,6 @@ namespace System.Buffers
                 return false;
             }
         }
-
-        [UnsafeAccessor(UnsafeAccessorKind.StaticMethod, Name = "System.Globalization.TextInfo.ToUpperOrdinal")]
-        extern static char ToUpperOrdinal(char c);
-
-        [UnsafeAccessor(UnsafeAccessorKind.StaticMethod, Name = "System.Globalization.GlobalizationMode.get_UseNls")]
-        extern static bool UseNls();
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public readonly int IndexOfAny<TCaseSensitivity, TFastScanVariant>(ReadOnlySpan<char> span)
@@ -253,7 +246,7 @@ namespace System.Buffers
                     (uint)(i + 1) < (uint)span.Length &&
                     char.IsLowSurrogate(lowSurrogate = Unsafe.Add(ref MemoryMarshal.GetReference(span), i + 1)))
                 {
-                    if (UseNls())
+                    if (CorelibCompat.UseNls)
                     {
                         SurrogateToUpperNLS(c, lowSurrogate, out c, out lowSurrogateUpper);
                     }
@@ -266,7 +259,7 @@ namespace System.Buffers
                 }
                 else
                 {
-                    c = ToUpperOrdinal(c);
+                    c = CorelibCompat.ToUpperOrdinal(c);
                 }
             }
 
