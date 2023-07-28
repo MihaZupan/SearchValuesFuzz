@@ -115,8 +115,8 @@ namespace System.Buffers
 
         protected AsciiStringSearchValuesTeddyBase(ReadOnlySpan<string> values, HashSet<string> uniqueValues, int n) : base(values, uniqueValues)
         {
-            Debug.Assert(!TBucketized.Value);
-            Debug.Assert(n is 2 or 3);
+            RealAssert.Assert(!TBucketized.Value);
+            RealAssert.Assert(n is 2 or 3);
 
             _buckets = new EightPackedReferences(MemoryMarshal.CreateReadOnlySpan(
                 ref Unsafe.As<string, object>(ref MemoryMarshal.GetReference(values)),
@@ -133,8 +133,8 @@ namespace System.Buffers
 
         protected AsciiStringSearchValuesTeddyBase(string[][] buckets, ReadOnlySpan<string> values, HashSet<string> uniqueValues, int n) : base(values, uniqueValues)
         {
-            Debug.Assert(TBucketized.Value);
-            Debug.Assert(n is 2 or 3);
+            RealAssert.Assert(TBucketized.Value);
+            RealAssert.Assert(n is 2 or 3);
 
             _buckets = new EightPackedReferences(buckets);
 
@@ -248,7 +248,7 @@ namespace System.Buffers
         {
             // See comments in 'IndexOfAnyN3Vector128' below.
             // This method is the same, but operates on 32 input characters at a time and compares 2 starting chars instead of 3.
-            Debug.Assert(span.Length >= CharsPerIterationAvx2 + MatchStartOffsetN2);
+            RealAssert.Assert(span.Length >= CharsPerIterationAvx2 + MatchStartOffsetN2);
 
             ref char searchSpace = ref MemoryMarshal.GetReference(span);
             ref char lastSearchSpaceStart = ref Unsafe.Add(ref searchSpace, span.Length - CharsPerIterationAvx2);
@@ -300,7 +300,7 @@ namespace System.Buffers
         {
             // See comments in 'IndexOfAnyN3Vector128' below.
             // This method is the same, but operates on 64 input characters at a time and compares 2 starting chars instead of 3.
-            Debug.Assert(span.Length >= CharsPerIterationAvx512 + MatchStartOffsetN2);
+            RealAssert.Assert(span.Length >= CharsPerIterationAvx512 + MatchStartOffsetN2);
 
             ref char searchSpace = ref MemoryMarshal.GetReference(span);
             ref char lastSearchSpaceStart = ref Unsafe.Add(ref searchSpace, span.Length - CharsPerIterationAvx512);
@@ -425,7 +425,7 @@ namespace System.Buffers
         {
             // See comments in 'IndexOfAnyN3Vector128' above.
             // This method is the same, but operates on 32 input characters at a time.
-            Debug.Assert(span.Length >= CharsPerIterationAvx2 + MatchStartOffsetN3);
+            RealAssert.Assert(span.Length >= CharsPerIterationAvx2 + MatchStartOffsetN3);
 
             ref char searchSpace = ref MemoryMarshal.GetReference(span);
             ref char lastSearchSpaceStart = ref Unsafe.Add(ref searchSpace, span.Length - CharsPerIterationAvx2);
@@ -480,7 +480,7 @@ namespace System.Buffers
         {
             // See comments in 'IndexOfAnyN3Vector128' above.
             // This method is the same, but operates on 64 input characters at a time.
-            Debug.Assert(span.Length >= CharsPerIterationAvx512 + MatchStartOffsetN3);
+            RealAssert.Assert(span.Length >= CharsPerIterationAvx512 + MatchStartOffsetN3);
 
             ref char searchSpace = ref MemoryMarshal.GetReference(span);
             ref char lastSearchSpaceStart = ref Unsafe.Add(ref searchSpace, span.Length - CharsPerIterationAvx512);
@@ -557,7 +557,7 @@ namespace System.Buffers
                     int candidateOffset = BitOperations.TrailingZeroCount(candidateMask);
 
                     object? bucket = _buckets[candidateOffset];
-                    Debug.Assert(bucket is not null);
+                    RealAssert.Assert(bucket is not null);
 
                     if (TBucketized.Value
                         ? StartsWith<TCaseSensitivity>(ref matchRef, lengthRemaining, Unsafe.As<string[]>(bucket))
@@ -602,7 +602,7 @@ namespace System.Buffers
                     int candidateOffset = BitOperations.TrailingZeroCount(candidateMask);
 
                     object? bucket = _buckets[candidateOffset];
-                    Debug.Assert(bucket is not null);
+                    RealAssert.Assert(bucket is not null);
 
                     if (TBucketized.Value
                         ? StartsWith<TCaseSensitivity>(ref matchRef, lengthRemaining, Unsafe.As<string[]>(bucket))
@@ -647,7 +647,7 @@ namespace System.Buffers
                     int candidateOffset = BitOperations.TrailingZeroCount(candidateMask);
 
                     object? bucket = _buckets[candidateOffset];
-                    Debug.Assert(bucket is not null);
+                    RealAssert.Assert(bucket is not null);
 
                     if (TBucketized.Value
                         ? StartsWith<TCaseSensitivity>(ref matchRef, lengthRemaining, Unsafe.As<string[]>(bucket))

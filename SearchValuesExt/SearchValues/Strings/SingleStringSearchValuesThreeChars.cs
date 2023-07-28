@@ -31,11 +31,11 @@ namespace System.Buffers
         public SingleStringSearchValuesThreeChars(string value)
         {
             // We could have more than one entry in 'uniqueValues' if this value is an exact prefix of all the others.
-            Debug.Assert(value.Length > 1);
+            RealAssert.Assert(value.Length > 1);
 
             CharacterFrequencyHelper.GetSingleStringMultiCharacterOffsets(value, IgnoreCase, out int ch2Offset, out int ch3Offset);
 
-            Debug.Assert(ch3Offset == 0 || ch3Offset > ch2Offset);
+            RealAssert.Assert(ch3Offset == 0 || ch3Offset > ch2Offset);
 
             _value = value;
             _minusValueTailLength = -(value.Length - 1);
@@ -317,7 +317,7 @@ namespace System.Buffers
             do
             {
                 int bitPos = BitOperations.TrailingZeroCount(mask);
-                Debug.Assert(bitPos % 2 == 0);
+                RealAssert.Assert(bitPos % 2 == 0);
 
                 ref char matchRef = ref Unsafe.AddByteOffset(ref searchSpace, bitPos);
 
@@ -345,7 +345,7 @@ namespace System.Buffers
             do
             {
                 int bitPos = BitOperations.TrailingZeroCount(mask);
-                Debug.Assert(bitPos % 2 == 0);
+                RealAssert.Assert(bitPos % 2 == 0);
 
                 ref char matchRef = ref Unsafe.AddByteOffset(ref searchSpace, bitPos);
 

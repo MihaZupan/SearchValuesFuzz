@@ -12,26 +12,24 @@ namespace System.Buffers
     // such as normalizing and matching values under different case sensitivity rules.
     internal static class StringSearchValuesHelper
     {
-        [Conditional("DEBUG")]
         public static void ValidateReadPosition(ref char searchSpaceStart, int searchSpaceLength, ref char searchSpace, int offset = 0)
         {
-            Debug.Assert(searchSpaceLength >= 0);
+            RealAssert.Assert(searchSpaceLength >= 0);
 
             ValidateReadPosition(MemoryMarshal.CreateReadOnlySpan(ref searchSpaceStart, searchSpaceLength), ref searchSpace, offset);
         }
 
-        [Conditional("DEBUG")]
         public static void ValidateReadPosition(ReadOnlySpan<char> span, ref char searchSpace, int offset = 0)
         {
-            Debug.Assert(offset >= 0);
+            RealAssert.Assert(offset >= 0);
 
             nint currentByteOffset = Unsafe.ByteOffset(ref MemoryMarshal.GetReference(span), ref searchSpace);
-            Debug.Assert(currentByteOffset >= 0);
-            Debug.Assert((currentByteOffset & 1) == 0);
+            RealAssert.Assert(currentByteOffset >= 0);
+            RealAssert.Assert((currentByteOffset & 1) == 0);
 
             int currentOffset = (int)(currentByteOffset / 2);
             int availableLength = span.Length - currentOffset;
-            Debug.Assert(offset <= availableLength);
+            RealAssert.Assert(offset <= availableLength);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -53,7 +51,7 @@ namespace System.Buffers
         public static bool StartsWith<TCaseSensitivity>(ref char matchStart, int lengthRemaining, string candidate)
             where TCaseSensitivity : struct, ICaseSensitivity
         {
-            Debug.Assert(lengthRemaining > 0);
+            RealAssert.Assert(lengthRemaining > 0);
 
             if (lengthRemaining < candidate.Length)
             {

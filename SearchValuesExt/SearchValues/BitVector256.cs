@@ -12,7 +12,7 @@ namespace System.Buffers
 
         public void Set(int c)
         {
-            Debug.Assert(c < 256);
+            RealAssert.Assert(c < 256);
             uint offset = (uint)(c >> 5);
             uint significantBit = 1u << c;
             _values[offset] |= significantBit;
@@ -33,7 +33,7 @@ namespace System.Buffers
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private readonly bool ContainsUnchecked(int b)
         {
-            Debug.Assert(b < 256);
+            RealAssert.Assert(b < 256);
             uint offset = (uint)(b >> 5);
             uint significantBit = 1u << b;
             return (_values[offset] & significantBit) != 0;

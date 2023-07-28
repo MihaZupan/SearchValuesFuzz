@@ -36,7 +36,7 @@ namespace System.Buffers
             }
 
             object children = _children;
-            Debug.Assert(children is int[] || children is Dictionary<char, int>);
+            RealAssert.Assert(children is int[] || children is Dictionary<char, int>);
 
             if (children.GetType() == typeof(int[]))
             {
@@ -92,7 +92,7 @@ namespace System.Buffers
                 }
                 else
                 {
-                    Debug.Assert(ReferenceEquals(_children, EmptyChildrenSentinel));
+                    RealAssert.Assert(ReferenceEquals(_children, EmptyChildrenSentinel));
                 }
             }
         }
@@ -135,7 +135,7 @@ namespace System.Buffers
                 // Currently we will sacrifice up to ~2x the memory consumption to use int[] for faster lookups.
                 const int AcceptableSizeMultiplier = 2;
 
-                Debug.Assert(children.Count > 0);
+                RealAssert.Assert(children.Count > 0);
 
                 int maxValue = -1;
 

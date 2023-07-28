@@ -15,7 +15,7 @@ namespace System.Buffers
 
         public EightPackedReferences(ReadOnlySpan<object> values)
         {
-            Debug.Assert(values.Length is > 0 and <= 8, $"Got {values.Length} values");
+            RealAssert.Assert(values.Length is > 0 and <= 8, $"Got {values.Length} values");
 
             values.CopyTo(this!);
         }

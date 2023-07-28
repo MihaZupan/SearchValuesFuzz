@@ -13,7 +13,7 @@ namespace System.Buffers
         // This method is the same as GenerateBucketizedFingerprint below, but each bucket only contains 1 value.
         public static (Vector512<byte> Low, Vector512<byte> High) GenerateNonBucketizedFingerprint(ReadOnlySpan<string> values, int offset)
         {
-            Debug.Assert(values.Length <= 8);
+            RealAssert.Assert(values.Length <= 8);
 
             Vector128<byte> low = default;
             Vector128<byte> high = default;
@@ -25,7 +25,7 @@ namespace System.Buffers
                 int bit = 1 << i;
 
                 char c = value[offset];
-                Debug.Assert(char.IsAscii(c));
+                RealAssert.Assert(char.IsAscii(c));
 
                 int lowNibble = c & 0xF;
                 int highNibble = c >> 4;
@@ -46,7 +46,7 @@ namespace System.Buffers
         // We repeat this for each bucket and then OR together the bitmaps (fingerprints) of each bucket to generate a single bitmap for each nibble.
         public static (Vector512<byte> Low, Vector512<byte> High) GenerateBucketizedFingerprint(string[][] valueBuckets, int offset)
         {
-            Debug.Assert(valueBuckets.Length <= 8);
+            RealAssert.Assert(valueBuckets.Length <= 8);
 
             Vector128<byte> low = default;
             Vector128<byte> high = default;
@@ -58,7 +58,7 @@ namespace System.Buffers
                 foreach (string value in valueBuckets[i])
                 {
                     char c = value[offset];
-                    Debug.Assert(char.IsAscii(c));
+                    RealAssert.Assert(char.IsAscii(c));
 
                     int lowNibble = c & 0xF;
                     int highNibble = c >> 4;
@@ -80,9 +80,9 @@ namespace System.Buffers
 
         public static string[][] Bucketize(ReadOnlySpan<string> values, int bucketCount, int n)
         {
-            Debug.Assert(bucketCount == 8, "This may change if we end up supporting the 'fat Teddy' variant.");
-            Debug.Assert(values.Length > bucketCount, "Should be using a non-bucketized implementation.");
-            Debug.Assert(values.Length <= RabinKarp.MaxValues);
+            RealAssert.Assert(bucketCount == 8, "This may change if we end up supporting the 'fat Teddy' variant.");
+            RealAssert.Assert(values.Length > bucketCount, "Should be using a non-bucketized implementation.");
+            RealAssert.Assert(values.Length <= RabinKarp.MaxValues);
 
             // Stores the offset of the bucket each value should be assigned to.
             // This lets us avoid allocating temporary lists to build up each bucket.
@@ -100,7 +100,7 @@ namespace System.Buffers
                 int prefix = 0;
                 for (int j = 0; j < n; j++)
                 {
-                    Debug.Assert(char.IsAscii(value[j]));
+                    RealAssert.Assert(char.IsAscii(value[j]));
                     prefix = (prefix << 8) | value[j];
                 }
 
@@ -132,7 +132,7 @@ namespace System.Buffers
                         strings[count++] = values[i];
                     }
                 }
-                Debug.Assert(count == strings.Length);
+                RealAssert.Assert(count == strings.Length);
             }
 
             return buckets;

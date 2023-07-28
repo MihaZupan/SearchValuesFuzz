@@ -59,7 +59,7 @@ namespace System.Buffers
         internal static unsafe void ComputeBitmap<T>(ReadOnlySpan<T> values, out Vector256<byte> bitmap, out BitVector256 lookup)
             where T : struct, IUnsignedNumber<T>
         {
-            Debug.Assert(typeof(T) == typeof(byte) || typeof(T) == typeof(char));
+            RealAssert.Assert(typeof(T) == typeof(byte) || typeof(T) == typeof(char));
 
             Vector128<byte> bitmapSpace = default;
             byte* bitmapLocal = (byte*)&bitmapSpace;
@@ -129,7 +129,7 @@ namespace System.Buffers
 
                 // We have 1-32 characters remaining. Process the first and last vector in the search space.
                 // They may overlap, but we'll handle that in the index calculation if we do get a match.
-                Debug.Assert(searchSpaceLength >= Vector256<short>.Count, "We expect that the input is long enough for us to load a whole vector.");
+                RealAssert.Assert(searchSpaceLength >= Vector256<short>.Count, "We expect that the input is long enough for us to load a whole vector.");
                 {
                     ref short oneVectorAwayFromEnd = ref Unsafe.Add(ref searchSpace, searchSpaceLength - Vector256<short>.Count);
 
@@ -182,7 +182,7 @@ namespace System.Buffers
 
             // We have 1-16 characters remaining. Process the first and last vector in the search space.
             // They may overlap, but we'll handle that in the index calculation if we do get a match.
-            Debug.Assert(searchSpaceLength >= Vector128<short>.Count, "We expect that the input is long enough for us to load a whole vector.");
+            RealAssert.Assert(searchSpaceLength >= Vector128<short>.Count, "We expect that the input is long enough for us to load a whole vector.");
             {
                 ref short oneVectorAwayFromEnd = ref Unsafe.Add(ref searchSpace, searchSpaceLength - Vector128<short>.Count);
 
@@ -246,7 +246,7 @@ namespace System.Buffers
 
                 // We have 1-32 characters remaining. Process the first and last vector in the search space.
                 // They may overlap, but we'll handle that in the index calculation if we do get a match.
-                Debug.Assert(searchSpaceLength >= Vector256<short>.Count, "We expect that the input is long enough for us to load a whole vector.");
+                RealAssert.Assert(searchSpaceLength >= Vector256<short>.Count, "We expect that the input is long enough for us to load a whole vector.");
                 {
                     ref short oneVectorAfterStart = ref Unsafe.Add(ref searchSpace, Vector256<short>.Count);
 
@@ -297,7 +297,7 @@ namespace System.Buffers
 
             // We have 1-16 characters remaining. Process the first and last vector in the search space.
             // They may overlap, but we'll handle that in the index calculation if we do get a match.
-            Debug.Assert(searchSpaceLength >= Vector128<short>.Count, "We expect that the input is long enough for us to load a whole vector.");
+            RealAssert.Assert(searchSpaceLength >= Vector128<short>.Count, "We expect that the input is long enough for us to load a whole vector.");
             {
                 ref short oneVectorAfterStart = ref Unsafe.Add(ref searchSpace, Vector128<short>.Count);
 
@@ -357,7 +357,7 @@ namespace System.Buffers
 
                 // We have 1-32 bytes remaining. Process the first and last half vectors in the search space.
                 // They may overlap, but we'll handle that in the index calculation if we do get a match.
-                Debug.Assert(searchSpaceLength >= Vector128<byte>.Count, "We expect that the input is long enough for us to load a Vector128.");
+                RealAssert.Assert(searchSpaceLength >= Vector128<byte>.Count, "We expect that the input is long enough for us to load a Vector128.");
                 {
                     ref byte halfVectorAwayFromEnd = ref Unsafe.Add(ref searchSpace, searchSpaceLength - Vector128<byte>.Count);
 
@@ -406,7 +406,7 @@ namespace System.Buffers
 
             // We have 1-16 bytes remaining. Process the first and last half vectors in the search space.
             // They may overlap, but we'll handle that in the index calculation if we do get a match.
-            Debug.Assert(searchSpaceLength >= sizeof(ulong), "We expect that the input is long enough for us to load a ulong.");
+            RealAssert.Assert(searchSpaceLength >= sizeof(ulong), "We expect that the input is long enough for us to load a ulong.");
             {
                 ref byte halfVectorAwayFromEnd = ref Unsafe.Add(ref searchSpace, searchSpaceLength - sizeof(ulong));
 
@@ -467,7 +467,7 @@ namespace System.Buffers
 
                 // We have 1-32 bytes remaining. Process the first and last half vectors in the search space.
                 // They may overlap, but we'll handle that in the index calculation if we do get a match.
-                Debug.Assert(searchSpaceLength >= Vector128<byte>.Count, "We expect that the input is long enough for us to load a Vector128.");
+                RealAssert.Assert(searchSpaceLength >= Vector128<byte>.Count, "We expect that the input is long enough for us to load a Vector128.");
                 {
                     ref byte halfVectorAfterStart = ref Unsafe.Add(ref searchSpace, Vector128<byte>.Count);
 
@@ -516,7 +516,7 @@ namespace System.Buffers
 
             // We have 1-16 bytes remaining. Process the first and last half vectors in the search space.
             // They may overlap, but we'll handle that in the index calculation if we do get a match.
-            Debug.Assert(searchSpaceLength >= sizeof(ulong), "We expect that the input is long enough for us to load a ulong.");
+            RealAssert.Assert(searchSpaceLength >= sizeof(ulong), "We expect that the input is long enough for us to load a ulong.");
             {
                 ref byte halfVectorAfterStart = ref Unsafe.Add(ref searchSpace, sizeof(ulong));
 

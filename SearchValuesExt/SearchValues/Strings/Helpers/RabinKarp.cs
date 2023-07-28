@@ -37,7 +37,7 @@ namespace System.Buffers
 
         public RabinKarp(ReadOnlySpan<string> values)
         {
-            Debug.Assert(values.Length <= MaxValues);
+            RealAssert.Assert(values.Length <= MaxValues);
 
             int minimumLength = int.MaxValue;
             foreach (string value in values)
@@ -45,7 +45,7 @@ namespace System.Buffers
                 minimumLength = Math.Min(minimumLength, value.Length);
             }
 
-            Debug.Assert(minimumLength > 1);
+            RealAssert.Assert(minimumLength > 1);
 
             _hashLength = minimumLength;
             _hashUpdateMultiplier = (nuint)1 << ((minimumLength - 1) * HashShiftPerElement);
@@ -100,8 +100,8 @@ namespace System.Buffers
         private readonly int IndexOfAnyCore<TCaseSensitivity>(ReadOnlySpan<char> span)
             where TCaseSensitivity : struct, ICaseSensitivity
         {
-            Debug.Assert(typeof(TCaseSensitivity) != typeof(CaseInsensitiveUnicode));
-            Debug.Assert(span.Length <= MaxInputLength, "Teddy should have handled short inputs.");
+            RealAssert.Assert(typeof(TCaseSensitivity) != typeof(CaseInsensitiveUnicode));
+            RealAssert.Assert(span.Length <= MaxInputLength, "Teddy should have handled short inputs.");
 
             ref char current = ref MemoryMarshal.GetReference(span);
 
@@ -117,7 +117,7 @@ namespace System.Buffers
                     hash = (hash << HashShiftPerElement) + TCaseSensitivity.TransformInput(Unsafe.Add(ref current, i));
                 }
 
-                Debug.Assert(_buckets is not null);
+                RealAssert.Assert(_buckets is not null);
                 ref string[]? bucketsRef = ref MemoryMarshal.GetArrayDataReference(_buckets);
 
                 while (true)
@@ -153,7 +153,7 @@ namespace System.Buffers
 
         private readonly int IndexOfAnyCaseInsensitiveUnicode(ReadOnlySpan<char> span)
         {
-            Debug.Assert(span.Length <= MaxInputLength, "Teddy should have handled long inputs.");
+            RealAssert.Assert(span.Length <= MaxInputLength, "Teddy should have handled long inputs.");
 
             if (_hashLength > span.Length)
             {
@@ -164,7 +164,7 @@ namespace System.Buffers
             Span<char> upperCase = stackalloc char[MaxInputLength].Slice(0, span.Length);
 
             int charsWritten = CorelibCompat.ToUpperOrdinal(span, upperCase);
-            Debug.Assert(charsWritten == upperCase.Length);
+            RealAssert.Assert(charsWritten == upperCase.Length);
 
             // CaseSensitive instead of CaseInsensitiveUnicode as we've already done the case conversion.
             return IndexOfAnyCore<CaseSensitive>(upperCase);

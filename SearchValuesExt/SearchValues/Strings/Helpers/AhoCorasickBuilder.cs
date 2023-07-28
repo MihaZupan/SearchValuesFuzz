@@ -20,14 +20,14 @@ namespace System.Buffers
 
         public AhoCorasickBuilder(ReadOnlySpan<string> values, bool ignoreCase, ref HashSet<string>? unreachableValues)
         {
-            Debug.Assert(!values.IsEmpty);
-            Debug.Assert(!string.IsNullOrEmpty(values[0]));
+            RealAssert.Assert(!values.IsEmpty);
+            RealAssert.Assert(!string.IsNullOrEmpty(values[0]));
 
 #if DEBUG
             // The input should have been sorted by length
             for (int i = 1; i < values.Length; i++)
             {
-                Debug.Assert(values[i - 1].Length <= values[i].Length);
+                RealAssert.Assert(values[i - 1].Length <= values[i].Length);
             }
 #endif
 
@@ -40,7 +40,7 @@ namespace System.Buffers
         {
             AddSuffixLinks();
 
-            Debug.Assert(_nodes[0].MatchLength == 0, "The root node shouldn't have a match.");
+            RealAssert.Assert(_nodes[0].MatchLength == 0, "The root node shouldn't have a match.");
 
             for (int i = 0; i < _nodes.Length; i++)
             {

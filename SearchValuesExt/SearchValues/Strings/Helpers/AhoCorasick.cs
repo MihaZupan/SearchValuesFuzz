@@ -76,7 +76,7 @@ namespace System.Buffers
             where TCaseSensitivity : struct, StringSearchValuesHelper.ICaseSensitivity
             where TFastScanVariant : struct, IFastScan
         {
-            Debug.Assert(typeof(TCaseSensitivity) != typeof(StringSearchValuesHelper.CaseInsensitiveUnicode));
+            RealAssert.Assert(typeof(TCaseSensitivity) != typeof(StringSearchValuesHelper.CaseInsensitiveUnicode));
 
             ref AhoCorasickNode nodes = ref MemoryMarshal.GetArrayDataReference(_nodes);
             int nodeIndex = 0;
@@ -84,7 +84,7 @@ namespace System.Buffers
             int i = 0;
 
         FastScan:
-            Debug.Assert(nodeIndex == 0);
+            RealAssert.Assert(nodeIndex == 0);
             // We are currently in the root node and trying to find the next position of any starting character.
             // If all the values start with an ASCII character, use a vectorized helper to quickly skip over characters that can't start a match.
             if (IndexOfAnyAsciiSearcher.IsVectorizationSupported && typeof(TFastScanVariant) == typeof(IndexOfAnyAsciiFastScan))
@@ -119,12 +119,12 @@ namespace System.Buffers
 
         LoopWithoutRangeCheck:
             // Read the next input character and either find the next potential match prefix or transition back to the root node.
-            Debug.Assert((uint)i < (uint)span.Length);
+            RealAssert.Assert((uint)i < (uint)span.Length);
             char c = TCaseSensitivity.TransformInput(Unsafe.Add(ref MemoryMarshal.GetReference(span), i));
 
             while (true)
             {
-                Debug.Assert((uint)nodeIndex < (uint)_nodes.Length);
+                RealAssert.Assert((uint)nodeIndex < (uint)_nodes.Length);
                 ref AhoCorasickNode node = ref Unsafe.Add(ref nodes, (uint)nodeIndex);
 
                 if (node.TryGetChild(c, out int childIndex))
@@ -132,12 +132,12 @@ namespace System.Buffers
                     // We were able to extend the current match. If this node contains a potential match, remember that.
                     nodeIndex = childIndex;
 
-                    Debug.Assert((uint)nodeIndex < (uint)_nodes.Length);
+                    RealAssert.Assert((uint)nodeIndex < (uint)_nodes.Length);
                     int matchLength = Unsafe.Add(ref nodes, (uint)nodeIndex).MatchLength;
                     if (matchLength != 0)
                     {
                         // Any result we find from here on out may only be lower (longer match with a start closer to the beginning of the input).
-                        Debug.Assert(result == -1 || result >= i + 1 - matchLength);
+                        RealAssert.Assert(result == -1 || result >= i + 1 - matchLength);
                         result = i + 1 - matchLength;
                     }
 
@@ -165,8 +165,8 @@ namespace System.Buffers
                 if (nodeIndex < 0)
                 {
                     // A node with a suffix link of -1 indicates a match, see AhoCorasickBuilder.AddSuffixLinks.
-                    Debug.Assert(nodeIndex == -1);
-                    Debug.Assert(result >= 0);
+                    RealAssert.Assert(nodeIndex == -1);
+                    RealAssert.Assert(result >= 0);
                     goto Return;
                 }
 
@@ -228,7 +228,7 @@ namespace System.Buffers
 
         LoopWithoutRangeCheck:
             // Read the next input character and either find the next potential match prefix or transition back to the root node.
-            Debug.Assert((uint)i < (uint)span.Length);
+            RealAssert.Assert((uint)i < (uint)span.Length);
             char c;
             if (lowSurrogateUpper != LowSurrogateNotSet)
             {
@@ -246,9 +246,19 @@ namespace System.Buffers
                     (uint)(i + 1) < (uint)span.Length &&
                     char.IsLowSurrogate(lowSurrogate = Unsafe.Add(ref MemoryMarshal.GetReference(span), i + 1)))
                 {
-                    CorelibCompat.SurrogateCasingToUpper(c, lowSurrogate, out c, out lowSurrogateUpper);
+                    if (CorelibCompat.UseNls)
+                    {
+                        SurrogateToUpperNLS(c, lowSurrogate, out c, out lowSurrogateUpper);
+                    }
+                    else
+                    {
+                        CorelibCompat.SurrogateCasingToUpper(c, lowSurrogate, out c, out lowSurrogateUpper);
+                    }
 
-                    Debug.Assert(lowSurrogateUpper != LowSurrogateNotSet);
+                    RealAssert.Assert(lowSurrogateUpper != LowSurrogateNotSet);
+
+                    RealAssert.Assert(char.IsHighSurrogate(c));
+                    RealAssert.Assert(char.IsLowSurrogate(lowSurrogateUpper));
                 }
                 else
                 {
@@ -258,7 +268,7 @@ namespace System.Buffers
 
             while (true)
             {
-                Debug.Assert((uint)nodeIndex < (uint)_nodes.Length);
+                RealAssert.Assert((uint)nodeIndex < (uint)_nodes.Length);
                 ref AhoCorasickNode node = ref Unsafe.Add(ref nodes, (uint)nodeIndex);
 
                 if (node.TryGetChild(c, out int childIndex))
@@ -266,12 +276,12 @@ namespace System.Buffers
                     // We were able to extend the current match. If this node contains a potential match, remember that.
                     nodeIndex = childIndex;
 
-                    Debug.Assert((uint)nodeIndex < (uint)_nodes.Length);
+                    RealAssert.Assert((uint)nodeIndex < (uint)_nodes.Length);
                     int matchLength = Unsafe.Add(ref nodes, (uint)nodeIndex).MatchLength;
                     if (matchLength != 0)
                     {
                         // Any result we find from here on out may only be lower (longer match with a start closer to the beginning of the input).
-                        Debug.Assert(result == -1 || result >= i + 1 - matchLength);
+                        RealAssert.Assert(result == -1 || result >= i + 1 - matchLength);
                         result = i + 1 - matchLength;
                     }
 
@@ -299,8 +309,8 @@ namespace System.Buffers
                 if (nodeIndex < 0)
                 {
                     // A node with a suffix link of -1 indicates a match, see AhoCorasickBuilder.AddSuffixLinks.
-                    Debug.Assert(nodeIndex == -1);
-                    Debug.Assert(result >= 0);
+                    RealAssert.Assert(nodeIndex == -1);
+                    RealAssert.Assert(result >= 0);
                     goto Return;
                 }
 
@@ -309,6 +319,24 @@ namespace System.Buffers
 
         Return:
             return result;
+        }
+
+        private static void SurrogateToUpperNLS(char h, char l, out char hr, out char lr)
+        {
+            RealAssert.Assert(char.IsHighSurrogate(h));
+            RealAssert.Assert(char.IsLowSurrogate(l));
+
+            Span<char> chars = stackalloc char[] { h, l };
+            Span<char> destination = stackalloc char[2];
+
+            int written = CorelibCompat.ToUpperOrdinal(chars, destination);
+            RealAssert.Assert(written == 2);
+
+            hr = destination[0];
+            lr = destination[1];
+
+            //RealAssert.Assert(char.IsHighSurrogate(hr));
+            //RealAssert.Assert(char.IsLowSurrogate(lr));
         }
 
         public interface IFastScan { }

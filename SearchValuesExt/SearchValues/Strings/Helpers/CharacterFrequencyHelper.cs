@@ -31,8 +31,8 @@ namespace System.Buffers
 
         public static void GetSingleStringMultiCharacterOffsets(string value, bool ignoreCase, out int ch2Offset, out int ch3Offset)
         {
-            Debug.Assert(value.Length > 1);
-            Debug.Assert(!ignoreCase || char.IsAscii(value[0]));
+            RealAssert.Assert(value.Length > 1);
+            RealAssert.Assert(!ignoreCase || char.IsAscii(value[0]));
 
             ch2Offset = IndexOfAsciiCharWithLowestFrequency(value, ignoreCase);
             ch3Offset = 0;
@@ -40,7 +40,7 @@ namespace System.Buffers
             if (ch2Offset < 0)
             {
                 // We have fewer than 2 ASCII chars in the value.
-                Debug.Assert(!ignoreCase);
+                RealAssert.Assert(!ignoreCase);
 
                 // We don't have a frequency table for non-ASCII characters, pick a random one.
                 ch2Offset = value.Length - 1;
@@ -71,8 +71,8 @@ namespace System.Buffers
                 }
             }
 
-            Debug.Assert(ch2Offset != 0);
-            Debug.Assert(ch2Offset != ch3Offset);
+            RealAssert.Assert(ch2Offset != 0);
+            RealAssert.Assert(ch2Offset != ch3Offset);
 
             if (ch3Offset > 0 && ch3Offset < ch2Offset)
             {

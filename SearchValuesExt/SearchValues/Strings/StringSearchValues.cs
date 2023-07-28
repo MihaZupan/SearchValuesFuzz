@@ -56,7 +56,7 @@ namespace System.Buffers
             {
                 normalizedValues[i++] = NormalizeIfNeeded(value, ignoreCase);
             }
-            Debug.Assert(i == normalizedValues.Length);
+            RealAssert.Assert(i == normalizedValues.Length);
 
             // Aho-Corasick's ctor expects values to be sorted by length.
             normalizedValues.Sort(static (a, b) => a.Length.CompareTo(b.Length));
@@ -101,8 +101,8 @@ namespace System.Buffers
                     }
                 }
 
-                Debug.Assert(newCount <= values.Length - unreachableValues.Count);
-                Debug.Assert(newCount > 0);
+                RealAssert.Assert(newCount <= values.Length - unreachableValues.Count);
+                RealAssert.Assert(newCount > 0);
 
                 return values.Slice(0, newCount);
             }
@@ -138,7 +138,10 @@ namespace System.Buffers
 
             if (nonAsciiAffectedByCaseConversion)
             {
-                if (CorelibCompat.UseNls || ContainsIncompleteSurrogatePairs(values))
+                //bool nls = CorelibCompat.UseNls;
+                //bool invariant = CorelibCompat.Invariant;
+
+                if (ContainsIncompleteSurrogatePairs(values))
                 {
                     return new MultiStringIgnoreCaseSearchValuesFallback(uniqueValues);
                 }
@@ -242,7 +245,7 @@ namespace System.Buffers
                 asciiStartUnaffectedByCaseConversion = asciiStartUnaffectedByCaseConversion && !slice.ContainsAny(s_asciiLetters);
             }
 
-            Debug.Assert(!(asciiStartLettersOnly && asciiStartUnaffectedByCaseConversion));
+            RealAssert.Assert(!(asciiStartLettersOnly && asciiStartUnaffectedByCaseConversion));
 
             if (asciiStartUnaffectedByCaseConversion)
             {
@@ -270,9 +273,9 @@ namespace System.Buffers
             where TStartCaseSensitivity : struct, ICaseSensitivity
             where TCaseSensitivity : struct, ICaseSensitivity
         {
-            Debug.Assert(typeof(TStartCaseSensitivity) != typeof(CaseInsensitiveUnicode));
-            Debug.Assert(values.Length > 1);
-            Debug.Assert(n is 2 or 3);
+            RealAssert.Assert(typeof(TStartCaseSensitivity) != typeof(CaseInsensitiveUnicode));
+            RealAssert.Assert(values.Length > 1);
+            RealAssert.Assert(n is 2 or 3);
 
             if (values.Length > 8)
             {
@@ -379,15 +382,15 @@ namespace System.Buffers
             foreach (string value in values)
             {
                 const char HIGH_SURROGATE_START = '\ud800';
-                const char HIGH_SURROGATE_END = '\udbff';
+                const char LOW_SURROGATE_END = '\udfff';
 
-                int i = value.AsSpan().IndexOfAnyInRange(HIGH_SURROGATE_START, HIGH_SURROGATE_END);
+                int i = value.AsSpan().IndexOfAnyInRange(HIGH_SURROGATE_START, LOW_SURROGATE_END);
                 if (i < 0)
                 {
                     continue;
                 }
 
-                for (; i < value.Length; i++)
+                for (; (uint)i < (uint)value.Length; i++)
                 {
                     if (char.IsHighSurrogate(value[i]))
                     {
@@ -395,6 +398,12 @@ namespace System.Buffers
                         {
                             return true;
                         }
+
+                        i++;
+                    }
+                    else if (char.IsLowSurrogate(value[i]))
+                    {
+                        return true;
                     }
                 }
             }
