@@ -74,7 +74,18 @@ namespace Fuzz
         {
             SearchValuesExt<string> searchValues = SearchValuesExt.Create(needles, ComparisonType);
 
-            return searchValues.IndexOfAnyMultiString(haystack);
+            using BoundedMemory<char> haystackWithPoisonBefore = BoundedMemory.AllocateFromExistingData(haystack, PoisonPagePlacement.Before);
+            using BoundedMemory<char> haystackWithPoisonAfter = BoundedMemory.AllocateFromExistingData(haystack, PoisonPagePlacement.After);
+
+            int resultBefore = searchValues.IndexOfAnyMultiString(haystackWithPoisonBefore.Span);
+            int resultAfter = searchValues.IndexOfAnyMultiString(haystackWithPoisonAfter.Span);
+
+            if (resultBefore != resultAfter)
+            {
+                throw new Exception($"Different result with poison before/after: {resultBefore}, {resultAfter}");
+            }
+
+            return resultBefore;
         }
 
         private static int IndexOfAnyReferenceImpl(ReadOnlySpan<char> haystack, string[] needles)
